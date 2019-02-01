@@ -271,7 +271,8 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+  int negX = ~x + 1;
+  return (((x|negX)>>31) +1);
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -301,7 +302,33 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  // To make sure uf is not all zero
+  if (uf<<1){
+    // To make sure uf is normalized number
+    if ((uf<<1)>>24 ){
+      // If exp is all 1, means uf is either Inf or NaN.
+      if ( (uf & 0x7f800000) == 0x7f800000 )
+      {
+         uf = uf;
+      }
+      else{
+      unsigned int expPlus = 0x00800000;
+      uf = uf + expPlus;
+      }
+      }
+    // If uf is a denorm number
+    // If uf is the biggest denorm which will casue overflow.
+    else if (uf == 0x7fffff) {
+          uf = 0xfffffe;
+    }
+  else{
+      uf = (uf<<1) + ((!!(uf>>31))<<31);
+    }
+  }
+  // When uf is plus or minus zero.
+  else{
+  uf += 0;}
+  return uf;
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
