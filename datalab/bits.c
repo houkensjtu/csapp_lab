@@ -343,8 +343,49 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
-}
+
+    // To make sure uf is not all zero
+  if (uf<<1){
+
+    // Case 1: uf is normalized number
+    if ((uf<<1)>>24 ){
+      // If exp is all 1, means uf is either Inf or NaN.
+      if ( (uf & 0x7f800000) == 0x7f800000 )
+      {
+         uf = 0x80000000u;
+      }
+      else{
+      unsigned int sinMask = 0x80000000;    
+      unsigned int expMask = 0x7f800000;
+      unsigned int sigMask = 0x007fffff;
+      int exp = ((uf & expMask)>>23) - 127;
+      int sig = (uf & sigMask);
+      int sin = uf & sinMask;
+
+      // If exp is within int range
+      if (exp>=0 && exp <= 23 ){
+        if (!sin) {
+          uf = (sig>>(23-exp)) + (0x1<<exp) ;}
+        else{
+          uf = (sig>>(23-exp)) + (0x1<<exp) ;
+          uf = ~uf + 1;
+        }   
+      }
+      // If exp is too small
+      else if (exp < 0){uf = 0x0;}
+      else {uf = 0x80000000;}
+      }
+      }
+    // Case 2: If uf is a denorm number
+    else  {
+          uf = 0x0;
+    }
+  }
+  // When uf is plus or minus zero.
+  else{
+  uf = 0;}
+  return uf;
+}  
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
  *   (2.0 raised to the power x) for any 32-bit integer x.
