@@ -287,7 +287,60 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+  /* To convert x to positive number. (Including boundary case)
+  x = Tmin -> x = Tmax
+  x = Tmax -> x = Tmax
+
+  Tmin < x < 0 -> x = |x|
+  x = 0 -> x = 0
+  0 < x < Tmax -> x = x
+
+  x = -1 (0xFFFFFFFF) -> x = 0                                */
+  x = x ^ (x>>31);
+  int isZero=!x;
+  int notZeroMask=(!(!x)<<31)>>31;
+  int bits = 0;
+
+  /* Those masks are illegal operations, but can be generated 
+  by tricks performed in allOddBits. */
+  int left_16mask = 0xffff0000;
+  int left_16 = x & left_16mask;
+  int right_16mask = 0x0000ffff;
+  int right_16 = x & right_16mask;
+  int bin1 = !!(left_16) << 4;
+  x = ((x >> (!!(left_16) * 16)) & right_16mask);
+
+  int left_8mask = 0x0000ff00;
+  int left_8 = x & left_8mask;
+  int right_8mask = 0x000000ff;
+  int right_8 = x & right_8mask;
+  int bin2 = !!(left_8) << 3;
+  x = (x >> (!!(left_8) * 8)) & right_8mask;
+
+  int left_4mask = 0x000000f0;
+  int left_4 = x & left_4mask;
+  int right_4mask = 0x0000000f;
+  int right_4 = x & right_4mask;
+  int bin3 = !!(left_4) << 2;
+  x = (x >> (!!(left_4) * 4)) & right_4mask;
+
+  int left_2mask = 0x0000000c;
+  int left_2 = x & left_2mask;
+  int right_2mask = 0x00000003;
+  int right_2 = x & right_2mask;
+  int bin4 = !!(left_2) << 1;
+  x = (x >> (!!(left_2) * 2)) & right_2mask;
+
+  int left_1mask = 0x00000002;
+  int left_1 = x & left_1mask;
+  int right_1mask = 0x00000001;
+  int right_1 = x & right_1mask;
+  int bin5 = !!left_1 + !!right_1;
+  bin5 = !!left_1;
+    
+  bits = bin1 + bin2 + bin3 + bin4 + bin5 + 2;
+  return isZero|(bits&notZeroMask);
+  
 }
 //float
 /* 
@@ -400,5 +453,13 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+
+    unsigned ans;
+    if (x<-128) { ans = 0; }
+    else if (x>127) {ans = 0x7f800000;}
+    else {
+      int exp = x + 127;
+      ans = (exp<<23);
+    }
+    return ans;
 }
