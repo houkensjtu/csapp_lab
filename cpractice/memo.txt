@@ -1,0 +1,29 @@
+00000000000005fa <showbyte>:
+ 5fa:   55                      push   %rbp
+ 5fb:   48 89 e5                mov    %rsp,%rbp
+ 5fe:   48 89 7d e8             mov    %rdi,-0x18(%rbp)
+ 602:   48 8b 45 e8             mov    -0x18(%rbp),%rax
+ 606:   48 89 45 f8             mov    %rax,-0x8(%rbp)
+ 60a:   48 8b 45 f8             mov    -0x8(%rbp),%rax
+ 60e:   48 8d 50 01             lea    0x1(%rax),%rdx
+ 612:   48 8b 45 f8             mov    -0x8(%rbp),%rax
+ 616:   0f b6 40 02             movzbl 0x2(%rax),%eax
+ 61a:   88 02                   mov    %al,(%rdx)
+ 61c:   48 8b 45 f8             mov    -0x8(%rbp),%rax
+ 620:   5d                      pop    %rbp
+ 621:   c3                      retq  
+
+00000000000005fa <showbyte>:
+ 5fa:   55                      push   %rbp
+ 5fb:   48 89 e5                mov    %rsp,%rbp
+ 5fe:   48 89 7d e8             mov    %rdi,-0x18(%rbp)
+ 602:   48 8b 45 e8             mov    -0x18(%rbp),%rax
+ 606:   48 89 45 f8             mov    %rax,-0x8(%rbp)
+ 60a:   48 8b 45 f8             mov    -0x8(%rbp),%rax
+ 60e:   48 8d 50 01             lea    0x1(%rax),%rdx
+ 612:   48 8b 45 f8             mov    -0x8(%rbp),%rax
+ 616:   0f b6 40 02             movzbl 0x2(%rax),%eax
+ 61a:   88 02                   mov    %al,(%rdx)
+ 61c:   48 8b 45 f8             mov    -0x8(%rbp),%rax
+ 620:   5d                      pop    %rbp
+ 621:   c3                      retq   
