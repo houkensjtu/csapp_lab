@@ -1,0 +1,6 @@
+typedef int pixel;
+
+int alphaAndRed(pixel p)
+{
+  return (p>>16)& 0xffff;
+}
