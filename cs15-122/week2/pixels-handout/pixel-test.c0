@@ -1,0 +1,34 @@
+/* Testing pixel.c0 and prove pixel-bad.c0 */
+#use <conio>
+
+int main()
+{
+  // Run some edge cases (check for contract errors only)
+  get_red(1);
+  get_red(0);
+  get_red(-1);
+  get_red(0xFFFFFFFF);
+  get_red(0x7FFFFFFF);
+
+  get_green(1);
+  get_green(0);
+  get_green(-1);
+  get_green(0xFFFFFFFF);
+  get_green(0x7FFFFFFF);
+
+  get_blue(1);
+  get_blue(0);
+  get_blue(-1);
+  get_blue(0xFFFFFFFF);
+  get_blue(0x7FFFFFFF);
+
+  // Test some regular cases (check for contract errors & exploits)
+  assert(get_alpha(make_pixel(255, 238, 127, 45)) == 0x000000FF);
+  assert(get_red(make_pixel(255, 238, 127, 45)) == 0x000000EE);
+  assert(get_green(make_pixel(255, 238, 127, 45)) == 0x0000007F);
+  assert(get_blue(make_pixel(255, 238, 127, 45)) == 0x0000002D);
+
+  println("All test passed.\n");
+  return 0;
+
+}

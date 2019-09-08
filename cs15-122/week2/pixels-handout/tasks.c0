@@ -1,3 +1,5 @@
+#use <conio>
+#use <string>
 /* The file pixel.c0 describes the pixel type. It also defines the
  * pixel interface with five functions: get_red(p), get_green(p),
  * get_blue(p), get_alpha(p), and make_pixel(a,r,g,b).  If you're
@@ -25,7 +27,14 @@
  * change it so that it does. */
 
 pixel remove_red(pixel p) {
-  return 0xFF00FFFF & p;
+  // Below is the original version
+  // return 0xFF00FFFF & p;
+
+  int alpha = get_alpha(p);
+  int green = get_green(p);
+  int blue = get_blue(p);
+
+  return make_pixel(alpha, 0, green, blue);
 }
 
 /* This is some code for testing the remove_red() function. It *does*
@@ -56,6 +65,24 @@ pixel quantize(pixel p, int q)
 //@requires 0 <= q && q < 8;
 {
   // Implement me!
+  int mask0 = 0xFFFFFFFF;
+  int mask1 = 0xFFFEFEFE;
+  int mask2 = 0xFFFCFCFC;
+  int mask3 = 0xFFF8F8F8;
+  int mask4 = 0xFFF0F0F0;
+  int mask5 = 0xFFE0E0E0;
+  int mask6 = 0xFFC0C0C0;
+  int mask7 = 0xFF808080;
+
+  if (q==0) p = (p & mask0);
+  if (q==1) p = (p & mask1);
+  if (q==2) p = (p & mask2);
+  if (q==3) p = (p & mask3);
+  if (q==4) p = (p & mask4);
+  if (q==5) p = (p & mask5);
+  if (q==6) p = (p & mask6);
+  if (q==7) p = (p & mask7);
+
   return p;
 }
 
@@ -102,8 +129,12 @@ void count_zeroes(pixel[] A, int length, int[] results)
 //@requires \length(A) == length;
 //@requires \length(results) == 3;
 {
-  results = alloc_array(int, 3);
+  //results = alloc_array(int, 3);
   
+  results[0] = 0;
+  results[1] = 0;
+  results[2] = 0;
+
   for(int i = 0; i < length; i++) 
     //@loop_invariant 0 <= i;
     {
@@ -113,7 +144,9 @@ void count_zeroes(pixel[] A, int length, int[] results)
         results[1] = results[1] + 1;
       if (get_blue(A[i]) == 0) 
         results[2] = results[2] + 1;
+      // println(string_fromint(results[i]));
     }
+  
 }
 
 /* This is some code for testing the count_zeroes() function. You can
@@ -159,7 +192,8 @@ void test_count_zeroes() {
   // Initialize the array of pixels, make a copy.
   A = alloc_array(pixel, 9);  
   A[0] = make_pixel(0xFF, 0x01, 0x03, 0x04);
-  A[1] = make_pixel(0x02, 0x00, 0xFF, 0xEE);
+  A[1] = make_pixel(0x02, 0x00, 0xFF, 0xEE); 
+  println(string_fromint(get_red(A[1])));
   A[2] = make_pixel(0xFF, 0xFF, 0xFF, 0xFF);
   A[3] = make_pixel(0xEE, 0xFF, 0xDD, 0x00);
   A[4] = make_pixel(0xDD, 0xCC, 0x00, 0xFF);
