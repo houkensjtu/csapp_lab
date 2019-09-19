@@ -27,6 +27,7 @@ void reflect_main(string input, string output)
   /* Run transformation */
   print("Running reflect transform..."); 
   flush();
+
   pixel[] resultpixels = reflect(inpixels, width, height);
   //@assert \length(resultpixels) == (width * 2) * (height * 2);
   println("done.");

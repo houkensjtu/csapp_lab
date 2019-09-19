@@ -22,7 +22,7 @@ int get_row(int index, int width, int height)
 //@requires index>=0 && index<width*height;
 //@ensures \result>=0 && \result<=height;
 {
-  return (index+1) // width;
+  return (index+1) /width;
 }
 
 // Returns the column number of a pixel in an image of size width*
@@ -60,8 +60,8 @@ bool is_valid_pixel(int row, int col, int width, int height)
 // width*height.
 int get_index(int row, int col, int width, int height)
 //@requires is_valid_imagesize(width,height);
-//@requires is_valid_pixel(row,col);
-//@ensures \results>=0 && \result<width*height;
+//@requires is_valid_pixel(row,col,width,height);
+//@ensures \result>=0 && \result<width*height;
 {
   return row*width + col;
 }

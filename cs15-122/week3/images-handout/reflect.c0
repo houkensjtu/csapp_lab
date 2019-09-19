@@ -1,0 +1,65 @@
+/* Assumes that pixel is already defined to be an int (pixel.c0) */
+/* typedef int pixel; */
+
+#use <util>
+#use <conio>
+
+pixel[] reflect (pixel[] A, int width, int height)
+//@requires width > 0 && height > 0 && width <= int_max() / height;
+//@requires \length(A) == width*height;
+//@ensures \length(\result) == 4 * \length(A);
+{
+  pixel[] B = alloc_array(pixel, 4*width*height);
+
+  for (int j = 0; j < height; j++)
+    //@loop_invariant 0 <= j;
+    {
+
+      /* The upper left portion. */
+      for (int i = 0; i < width; i++)
+        //@loop_invariant 0 <= i;
+        {
+          //@assert 0 <= j && j < height && 0 <= i && i < width;
+          int index = get_index(j, i, 2*width, 2*height);
+          //@assert 0 <= index && index < 4*\length(A);
+          B[index] = A[ get_index(j,width-i-1,width,height) ];
+        }
+
+      /* The upper right portion. */
+      for (int i = width; i < 2*width; i++)
+        //@loop_invariant 0 <= i;
+        {
+          //@assert 0 <= j && j < height && width <= i && i < 2*width;
+          int index = get_index(j, i, 2*width, 2*height);
+          //@assert 0 <= index && index < 2*\length(A);
+          B[index] = A[ get_index(j,i-width,width,height) ];
+        }
+    }
+
+    for (int j = height; j < 2*height; j++)
+    //@loop_invariant height <= j;
+    {
+
+      /* The lower left portion. */
+      for (int i = 0; i < width; i++)
+        //@loop_invariant 0 <= i;
+        {
+          //@assert height <= j && j < 2*height && 0 <= i && i < width;
+          int index = get_index(j, i, 2*width, 2*height);
+          //@assert 0 <= index && index < 4*\length(A);
+          B[index] = A[ get_index(2*height-j-1,width-i-1,width,height) ];
+        }
+
+      /* The lower right portion. */
+      for (int i = width; i < 2*width; i++)
+        //@loop_invariant 0 <= i;
+        {
+          //@assert height <= j && j < 2*height && width <= i && i < 2*width;
+          int index = get_index(j, i, 2*width, 2*height);
+          //@assert 0 <= index && index < 4*\length(A);
+          B[index] = A[ get_index(2*height-j-1,i-width,width,height) ];
+        }
+    }
+
+  return B;
+}

@@ -21,7 +21,18 @@ pixel[] remove_red (pixel[] A, int width, int height)
           int index = get_index(j, i, width, height);
           //@assert 0 <= index && index < \length(A);
           //@assert \length(A) == \length(B);
-          B[index] = A[index] & 0xFF00FFFF;
+
+
+          /* This is the non pixel version. */
+          //B[index] = A[index] & 0xFF00FFFF;
+
+          /* Below is my version used pixel interface. */
+          
+          int g = get_green(A[index]);
+          int b = get_blue(A[index]);
+          int a = get_alpha(A[index]);
+          B[index] = make_pixel(a, 0, g, b);
+
         }
     }
 
