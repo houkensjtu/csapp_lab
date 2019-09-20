@@ -4,8 +4,8 @@
 #use <util>
 
 int weight(int[] mask, int maskwidth, int flag);
-
-int apply_mask(int[] A, int index, int[] mask, int maskwidth, int weight);
+int apply_mask(int[] A, int width, int height,
+               int index, int[] mask, int maskwidth, int weight);
 
 pixel[] blur (pixel[] pixels, int width, int height,
               int[] mask, int maskwidth)
@@ -31,7 +31,8 @@ pixel[] blur (pixel[] pixels, int width, int height,
 
 
           /* This is the non pixel version. */
-          B[index] = apply_mask(pixels, index, mask, maskwidth, w);
+          B[index] = apply_mask(pixels, width, height,
+                                index, mask, maskwidth, w);
 
         }
     }
@@ -74,23 +75,38 @@ int weight(int[] mask, int maskwidth, int flag)
 }
 
 
-int apply_mask(int[] A, int index, int[] mask, int maskwidth, int weight)
+int apply_mask(int[] A, int width, int height, int index,
+               int[] mask, int maskwidth, int weight)
+//@requires index >= 0 && index < \length(A);
+//@requires maskwidth*maskwidth == \length(mask);
 {
   int rs = 0;
   int gs = 0;
   int bs = 0;
+  int row = get_row(index, width, height);
+  int col = get_column(index, width, height);
+  
+  // The span of a mask. Ex. maskwidth = 5, span = 2.
+  int span = maskwidth / 2;
 
-  int span = (maskwidth / 2) * maskwidth + maskwidth / 2;
-
-  for (int i = 0; i < maskwidth*maskwidth; i++){
-     rs += get_red(A[index - span + i]) * mask[i];
-     gs += get_green(A[index - span + i]) * mask[i];
-     bs += get_blue(A[index - span + i]) * mask[i];
+  // Index for the mask.
+  int k = 0;
+  
+  for (int j = row-span; j < row+span+1; j++)
+  {
+    for (int i = col - span; i < col+span+1; i++)
+    {
+       rs += get_red(A[get_index(j,i,width,height)]) * mask[k];
+       gs += get_green(A[get_index(j,i,width,height)]) * mask[k];
+       bs += get_blue(A[get_index(j,i,width,height)]) * mask[k];
+       k++;
+    }
   }
+  
+  int alpha = get_alpha(A[index]);
   int r = rs/weight;
   int g = gs/weight;
   int b = bs/weight;
-  int alpha = get_alpha(A[index]);
   
   return make_pixel(alpha, r, g, b);
 }
