@@ -1,0 +1,96 @@
+#use <conio>
+/* Assumes that pixel is already defined to be an int (pixel.c0) */
+/* typedef int pixel; */
+#use <util>
+
+int weight(int[] mask, int maskwidth, int flag);
+
+int apply_mask(int[] A, int index, int[] mask, int maskwidth, int weight);
+
+pixel[] blur (pixel[] pixels, int width, int height,
+              int[] mask, int maskwidth)
+//@requires width > 0 && height > 0 && width <= int_max() / height;
+//@requires \length(pixels) == width*height;
+//@ensures \result != pixels;
+//@ensures \length(\result) == \length(pixels);
+{
+  pixel[] B = alloc_array(pixel, width*height);
+
+  int w = weight(mask, maskwidth, 1);
+
+  for (int j = 10; j < height-10; j++)
+    //@loop_invariant 0 <= j;
+    {
+      for (int i = 10; i < width-10; i++)
+        //@loop_invariant 0 <= i;
+        {
+          //@assert 0 <= j && j < height && 0 <= i && i < width;
+          int index = get_index(j, i, width, height);
+          //@assert 0 <= index && index < \length(pixels);
+          //@assert \length(pixels) == \length(B);
+
+
+          /* This is the non pixel version. */
+          B[index] = apply_mask(pixels, index, mask, maskwidth, w);
+
+        }
+    }
+
+  return B;
+}
+
+int weight(int[] mask, int maskwidth, int flag)
+{
+  /* Whole matrix */
+  int w = 0;
+  if (flag == 1) {
+     for (int i = 0; i < maskwidth; i++){
+        for (int j = 0; j < maskwidth; j++){
+           w += mask[i*maskwidth + j];
+        }
+     }
+  }  
+
+  /* On border */
+  else if (flag == 2) {
+     for (int i = 0; i < maskwidth; i++){
+        for (int j = maskwidth/2; j < maskwidth; j++){
+           w += mask[i*maskwidth + j];
+        }
+     }
+  }
+
+  /* On corner */
+  else if (flag == 3) {
+     for (int i = maskwidth/2; i < maskwidth; i++){
+        for (int j = maskwidth/2; j < maskwidth; j++){
+           w += mask[i*maskwidth + j];
+        }
+     }
+  }  
+  
+  return w;
+
+}
+
+
+int apply_mask(int[] A, int index, int[] mask, int maskwidth, int weight)
+{
+  int rs = 0;
+  int gs = 0;
+  int bs = 0;
+
+  int span = (maskwidth / 2) * maskwidth + maskwidth / 2;
+
+  for (int i = 0; i < maskwidth*maskwidth; i++){
+     rs += get_red(A[index - span + i]) * mask[i];
+     gs += get_green(A[index - span + i]) * mask[i];
+     bs += get_blue(A[index - span + i]) * mask[i];
+  }
+  int r = rs/weight;
+  int g = gs/weight;
+  int b = bs/weight;
+  int alpha = get_alpha(A[index]);
+  
+  return make_pixel(alpha, r, g, b);
+}
