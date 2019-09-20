@@ -1,0 +1,36 @@
+/*Exercise 1.
+Write a function array_part that creates a copy of a part of a given
+array, namely the elements from position i to position j.
+Your function should have prototype int[] array_part(int[] A,int i,int j);
+Develop a specification and loop invariants for this function.
+Prove that it works correctly by checking the loop invariant and
+proving array bounds.
+*/
+
+#use <conio>
+
+int[] array_part(int[] A,int i,int j)
+//@requires i>=0 && j>=i && j<\length(A);
+//@ensures \length(\result)==j-i;
+{
+  int[] B = alloc_array(int, j-i);
+  for (int k = i; k < j; k++)
+  //@loop_invariant k >= i && k <= j;
+  //@loop_invariant (k-i)>=0 && (k-i)<=\length(B);
+  {
+    B[k-i] = A[k];
+  }
+  return B;
+}
+
+int main()
+{
+  int[] A = alloc_array(int, 10);
+  for (int i = 2; i < 7; i++) A[i] = i;
+  int[] B = array_part(A, 3, 8);
+  
+  for (int i = 0; i < 5; i++){
+    printint(B[i]);println("");
+  }
+  return 0;
+}

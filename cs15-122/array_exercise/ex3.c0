@@ -1,0 +1,9 @@
+/* Exercise 3.
+Can you develop a reasonable (non-degenerate) and useful function
+with the following prototype? Discuss.int f(int[] A);
+*/
+
+
+My thinking: No. Because you need the length of A to safely access
+any element of A. And the length of A is not knowable in C0 when
+not explicitly given.

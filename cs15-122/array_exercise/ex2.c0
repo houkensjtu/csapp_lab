@@ -1,0 +1,46 @@
+/* Exercise  2.
+Write a function copy_into that  copies  a  part  of  a  given  array
+source, namely n elements starting at position i, into another given array
+target,starting at position j. Your function should have prototype
+int copy_into(int[] source,int i,int n,int[] target,int j);
+As an extra service, make your function return the last position in the target ar-
+ray that it entered data into.  Develop a specification and loop invariants for this
+function. Prove that it works correctly by checking the loop invariant and proving
+array bounds. What is difficult about this case?
+*/
+
+#use <conio>
+
+int copy_into(int[] source,int i,int n,int[] target,int j)
+//@requires i >= 0 && i < \length(source);
+//@requires j >= 0 && j < \length(target);
+//@requires n >= 0 && n < \length(source) && n < \length(target);
+//@requires (i + n) <= \length(source);
+//@requires (j + n) <= \length(target);
+{
+  for (int k = i; k < i+n; k++)
+  //@loop_invariant k >= 0 && k < \length(source);
+  //@loop_invariant (k-i+j) >= 0 && (k-i+j) < \length(target);
+  {
+    target[k-i+j] = source[k];
+  }
+  return n+j;
+}
+
+int main()
+{
+  int[] A = alloc_array(int, 20);
+  int[] B = alloc_array(int, 10);
+
+  for(int i = 0; i < 20; i++)
+  {
+    A[i] = i*i;
+  }
+  copy_into(A, 2, 8, B, 0);
+  
+  for (int i = 0; i < 10; i++){
+    printint(B[i]);println("");
+  }
+  return 0;
+
+}
