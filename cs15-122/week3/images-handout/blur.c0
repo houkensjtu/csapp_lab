@@ -5,7 +5,7 @@
 
 int weight(int[] mask, int maskwidth, int flag);
 int apply_mask(int[] A, int width, int height,
-               int index, int[] mask, int maskwidth, int weight);
+               int row, int col, int[] mask, int maskwidth);
 
 pixel[] blur (pixel[] pixels, int width, int height,
               int[] mask, int maskwidth)
@@ -16,23 +16,21 @@ pixel[] blur (pixel[] pixels, int width, int height,
 {
   pixel[] B = alloc_array(pixel, width*height);
 
-  int w = weight(mask, maskwidth, 1);
-
-  for (int j = 10; j < height-10; j++)
+  for (int j = 0; j < width; j++)
     //@loop_invariant 0 <= j;
     {
-      for (int i = 10; i < width-10; i++)
+      for (int i = 0; i < height; i++)
         //@loop_invariant 0 <= i;
         {
-          //@assert 0 <= j && j < height && 0 <= i && i < width;
-          int index = get_index(j, i, width, height);
+          //@assert 0 <= j && j < width && 0 <= i && i < height;
+          int index = get_index(i, j, width, height);
+          //printint(i); printint(j);printint(index);println("");
+
           //@assert 0 <= index && index < \length(pixels);
           //@assert \length(pixels) == \length(B);
 
-
-          /* This is the non pixel version. */
           B[index] = apply_mask(pixels, width, height,
-                                index, mask, maskwidth, w);
+                                i, j, mask, maskwidth);
 
         }
     }
@@ -40,65 +38,32 @@ pixel[] blur (pixel[] pixels, int width, int height,
   return B;
 }
 
-int weight(int[] mask, int maskwidth, int flag)
-{
-  /* Whole matrix */
-  int w = 0;
-  if (flag == 1) {
-     for (int i = 0; i < maskwidth; i++){
-        for (int j = 0; j < maskwidth; j++){
-           w += mask[i*maskwidth + j];
-        }
-     }
-  }  
-
-  /* On border */
-  else if (flag == 2) {
-     for (int i = 0; i < maskwidth; i++){
-        for (int j = maskwidth/2; j < maskwidth; j++){
-           w += mask[i*maskwidth + j];
-        }
-     }
-  }
-
-  /* On corner */
-  else if (flag == 3) {
-     for (int i = maskwidth/2; i < maskwidth; i++){
-        for (int j = maskwidth/2; j < maskwidth; j++){
-           w += mask[i*maskwidth + j];
-        }
-     }
-  }  
-  
-  return w;
-
-}
-
-
-int apply_mask(int[] A, int width, int height, int index,
-               int[] mask, int maskwidth, int weight)
-//@requires index >= 0 && index < \length(A);
+int apply_mask(int[] A, int width, int height, int row,
+               int col, int[] mask, int maskwidth)
 //@requires maskwidth*maskwidth == \length(mask);
 {
   int rs = 0;
   int gs = 0;
   int bs = 0;
-  int row = get_row(index, width, height);
-  int col = get_column(index, width, height);
-  
+  int index = get_index(row, col, width, height);
   // The span of a mask. Ex. maskwidth = 5, span = 2.
   int span = maskwidth / 2;
 
   // Index for the mask.
   int k = 0;
-  
-  for (int j = row-span; j < row+span+1; j++)
+  int weight = 0;
+
+  for (int i = row-span; i < row+span+1; i++)
   {
-    for (int i = col - span; i < col+span+1; i++)
+    for (int j = col - span; j < col+span+1; j++)
     {
-       rs += get_red(A[get_index(j,i,width,height)]) * mask[k];
-       gs += get_green(A[get_index(j,i,width,height)]) * mask[k];
-       bs += get_blue(A[get_index(j,i,width,height)]) * mask[k];
+       if (j >= 0 && i >= 0 && j < width && i < height){
+         rs += get_red(A[get_index(i,j,width,height)]) * mask[k];
+         gs += get_green(A[get_index(i,j,width,height)]) * mask[k];
+         bs += get_blue(A[get_index(i,j,width,height)]) * mask[k];
+
+         weight += mask[k];
+       }
        k++;
     }
   }

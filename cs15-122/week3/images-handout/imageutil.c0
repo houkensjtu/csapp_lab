@@ -37,6 +37,7 @@ int get_column(int index, int width, int height)
 //@requires index>=0 && index<width*height;
 //ensures \result>=0 && \result<=width;
 {
+  // This is buggy!
   return ( (index+1) % width )-1;
 }
 

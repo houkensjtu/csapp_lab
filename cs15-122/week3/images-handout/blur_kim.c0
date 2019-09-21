@@ -1,0 +1,102 @@
+#use <conio>
+
+bool is_nonnegative(pixel[] pixels, int width, int height);
+pixel[] blur(pixel[] pixels, int width, int height,
+             int[] mask, int maskwidth);
+int blurPixel(int row, int col, pixel[] pixels, int width, int height,
+              int[] mask, int maskwidth);
+
+pixel[] blur(pixel[] pixels, int width, int height, 
+             int[] mask, int maskwidth)
+//@requires is_valid_imagesize(width, height);
+//@requires is_valid_imagesize(maskwidth, maskwidth);
+//@requires \length(pixels) == width * height;
+//@requires \length(mask) == maskwidth * maskwidth;
+//@requires (maskwidth % 2 == 1) && maskwidth >= 1;
+//@requires is_nonnegative(mask, maskwidth, maskwidth);
+//@ensures \length(\result) == \length(pixels);
+{
+  int[] newPixels = alloc_array(int, width * height);
+  for (int row = 0; row < height; row++)
+  //@loop_invariant 0 <= row && row <= height;
+  {
+    for (int col = 0; col < width; col++)
+    //@loop_invariant 0 <= col && col <= width;
+    {
+      int idx = get_index(row, col, width, height);
+      newPixels[idx] = blurPixel(row, col, pixels, width, height, 
+                                 mask, maskwidth);
+    }
+  }
+  return newPixels;
+}
+ 
+
+int blurPixel(int row, int col, pixel[] pixels, int width, int height, 
+              int[] mask, int maskwidth)
+//@requires is_valid_imagesize(width, height);
+//@requires is_valid_imagesize(maskwidth, maskwidth);
+//@requires 0 <= row && row <= height;
+//@requires 0 <= col && col <= width;
+//@requires \length(pixels) == width * height;
+//@requires \length(mask) == maskwidth * maskwidth;
+//@requires is_nonnegative(mask, maskwidth, maskwidth);
+//@requires (maskwidth % 2 == 1) && maskwidth >= 1;
+{
+  int startCol = col - (maskwidth / 2);
+  int startRow = row - (maskwidth / 2);
+
+  int alpha = get_alpha(pixels[get_index(row, col, width, height)]);
+  int totalRed = 0;
+  int totalGreen = 0;
+  int totalBlue = 0;
+  int sum = 0;
+
+  for (int dRow = 0; dRow < maskwidth; dRow++)
+  //@loop_invariant 0 <= dRow && dRow <= maskwidth;
+  {
+    for (int dCol = 0; dCol < maskwidth; dCol++)
+    //@loop_invariant 0 <= dCol && dCol <= maskwidth;
+    {
+      int newRow = startRow + dRow;
+      int newCol = startCol + dCol;
+      
+      
+
+      if (0 <= newRow && newRow < height && 0 <= newCol && newCol < width) {
+        int maskIndex = get_index(dRow, dCol, maskwidth, maskwidth);
+        int pixelIndex = get_index(newRow, newCol, width, height);
+
+        totalRed += (mask[maskIndex] * get_red(pixels[pixelIndex]));
+        totalGreen += (mask[maskIndex] * get_green(pixels[pixelIndex]));
+        totalBlue += (mask[maskIndex] * get_blue(pixels[pixelIndex]));
+        sum += mask[maskIndex];
+      }
+      
+    }
+  }
+  //@assert sum!=0;
+  totalRed /= sum;
+  totalGreen /= sum;
+  totalBlue /= sum;
+
+  return make_pixel(alpha, totalRed, totalGreen, totalBlue);
+}
+
+
+bool is_nonnegative(pixel[] pixels, int width, int height)
+//@requires is_valid_imagesize(width, height);
+//@requires \length(pixels) == width * height;
+{
+  for (int i = 0; i < width * height; i++)
+  //@loop_invariant 0 <= i && i <= width * height;
+  {
+    if ((i == width * height / 2) && (pixels[i] <= 0)) {
+      return false;
+    }
+    else if ((i != width * height / 2) && (pixels[i] < 0)) {
+      return false;
+    }
+  }
+  return true;
+}
