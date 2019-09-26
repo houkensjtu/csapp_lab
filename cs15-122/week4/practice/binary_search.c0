@@ -1,0 +1,35 @@
+#use <conio>
+#use <string>
+
+int binary_search(int x, int[] A, int n)
+//@requires \length(A)==n;
+//@requires is_sorted(A,0,n);
+/*@ensures (\result==-1 && !is_in(x, A, 0, n)) ||
+           A[\result] == x; @*/
+{
+   int lo = 0;
+   int hi = n;
+   int mid = 0;
+   
+   while (lo < hi)
+   //@loop_invariant lo >=0 && hi <= n && lo <= hi;
+   {
+      mid = lo + (hi - lo) / 2;
+      if (A[mid]<x) lo = mid+1;
+      if (A[mid]>x) hi = mid;
+      if (A[mid]==x) return mid;
+   }
+   return -1;
+}
+
+int main()
+{
+  int[] A = alloc_array(int, 10);
+  for (int i = 0; i< 10; i++) A[i] = i*i;
+
+  int result = binary_search(99, A, 10);
+  printint(result);println("");
+
+  return 0;
+
+}
