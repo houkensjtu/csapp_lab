@@ -1,0 +1,56 @@
+#use <string>
+#use <conio>
+
+int count_vocab(string[] vocab, int[] freq, int v,
+string corpus,bool fast)
+//@requires v == \length(vocab) && v == \length(freq);
+//@requires is_sorted(vocab, 0, v);
+{
+  bundle_t B = read_words(corpus);
+
+  int len = string_bundle_length(B);
+  string[] src = string_bundle_array(B);
+
+  int count = 0;
+  for(int i = 0; i < len; i++){
+    if( i%10 == 0){
+    print("Searching word "); printint(i); println("");
+    }
+    string target = src[i];
+    int target_index = 0;        
+    if (!fast){
+      target_index = linsearch(target, vocab, v);
+    }
+    else{
+      target_index = binsearch(target, vocab, v);
+    }
+    
+    if (target_index != -1){
+      freq[target_index] += 1;
+    }
+    else{
+      count += 1;
+    }
+  }
+  
+  return count;
+}
+
+int main()
+{
+  println("Reading vocab ...");
+  bundle_t c = read_words("texts/news_vocab_sorted.txt");  
+  println("Reading finished.");
+  
+  string[] vocab = string_bundle_array(c);
+  int v = string_bundle_length(c);
+  int[] freq = alloc_array(int, v);
+
+  println("Now calculating ...");
+  int count = count_vocab(vocab, freq, v, "texts/sonnets.txt", true);
+
+  print("Result = ");printint(count);println("");
+
+  return 0;
+}
+
